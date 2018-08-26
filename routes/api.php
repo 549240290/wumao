@@ -16,3 +16,8 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+Route::get('trys', function () {
+    return response()->json(['msg'=>'哈哈','data'=>'this a json']);
+});
