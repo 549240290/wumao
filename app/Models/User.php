@@ -27,4 +27,13 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function findForPassport($username)
+    {
+        filter_var($username, FILTER_VALIDATE_EMAIL) ?
+        $credentials['email'] = $username :
+        $credentials['phone'] = $username;
+
+        return self::where($credentials)->first();
+    }
 }
