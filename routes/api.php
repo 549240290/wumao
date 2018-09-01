@@ -18,6 +18,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::get('trys', function () {
-    return response()->json(['msg'=>'哈哈','data'=>'this a json']);
-});
+//Route::post('/authentication', 'Authentication@index');
+Route::post('/authentication', 'Api\TonkenController@index');

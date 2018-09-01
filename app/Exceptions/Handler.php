@@ -51,6 +51,8 @@ class Handler extends ExceptionHandler
         if($request->is('api/*')){
             $response = [];
             $error = $this->convertExceptionToResponse($exception);
+            //dd($this->convertExceptionToResponse($exception));
+            //dd($error);
             $response['status'] = $error->getStatusCode();
             $response['msg'] = 'something error';
             if(config('app.debug')) {
