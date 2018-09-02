@@ -18,5 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-//Route::post('/authentication', 'Authentication@index');
-Route::post('/authentication', 'Api\TonkenController@index');
+Route::get('/authentication/{username}/{password}', 'Api\TonkenController@index');
+
+
+Route::post('/register','Api\RegisterController@index');

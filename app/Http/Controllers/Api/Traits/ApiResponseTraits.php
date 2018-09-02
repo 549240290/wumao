@@ -1,71 +1,61 @@
 <?php
-
+/**
+* 
+*   API 接口返回 Traits
+*
+**/
 namespace App\Http\Controllers\Api\Traits;
 
-use Symfony\Component\HttpFoundation\Response as FoundationResponse;
 use Response;
 
 trait ApiResponseTraits
 {
+    protected $statusCode = 200;
 
-    protected $statusCode = FoundationResponse::HTTP_OK;
-
-    public function getStatusCode()
+    # HTTP 200 响应头成功 且返回相应数据
+    public function success($data)
     {
-        return $this->statusCode;
+        $respond = [
+            'status'        => 'success',
+            'status_code'   => 200,
+            'data'          => compact('data')
+        ];
+        return $this->respond( array_merge($respond, compact('data')) );
     }
 
-    public function setStatusCode($statusCode)
+    # http 200 响应头成功 但存在异常 返回错误信息
+    public function message($message, $status_code = 200)
     {
-        $this->statusCode = $statusCode;
+        $respond = [
+            'status_code'   => $status_code,
+            'status'        => $status_code == 200 ? 'success' : 'fail',
+            'message'       => compact('message')
+        ];
+        return $this->respond( $respond );
+    }
+
+    # http 响应失败  比如 400 401 402 403 500 501 等
+    public function failed( $code = 400, $message = '')
+    {
+        return $this->setStatusCode( $code )->respond(compact('message'));
+    }
+
+    # 发送响应
+    public function respond( array $data = [] ,$header = [])
+    {
+        return Response::json( $data, $this->getStatusCode(),$header);
+    }
+
+    # 设置 HTTP 状态码方法
+    protected function setStatusCode( $code )
+    {
+        $this->statusCode = $code;
         return $this;
     }
 
-    public function respond($data, $header = [])
+    # 获取 HTTP 状态码方法
+    protected function getStatusCode()
     {
-        return Response::json($data, $this->getStatusCode(), $header);
+        return $this->statusCode;
     }
-
-    public function message($message, $status = "success")
-    {
-        return $this->status($status, [
-            'message' => $message
-        ]);
-    }
-
-    public function internalError($message = "Internal Error!")
-    {
-        return $this->failed($message, FoundationResponse::HTTP_INTERNAL_SERVER_ERROR);
-    }
-
-    public function success($data, $status = "success")
-    {
-        return $this->status($status, compact('data'));
-    }
-
-    public function failed($message, $code = FoundationResponse::HTTP_BAD_REQUEST, $status = 'error')
-    {
-        return $this->setStatusCode($code)->message($message, $status);
-    }
-
-    public function status($status, array $data, $code = null)
-    {
-        if ($code) {
-            $this->setStatusCode($code);
-        }
-        $status = [
-            'status' => $status,
-            'code' => $this->statusCode
-        ];
-
-        $data = array_merge($status, $data);
-        return $this->respond($data);
-    }
-
-
-    public function notFond($message = 'Not Fond!')
-    {
-        return $this->failed($message, Foundationresponse::HTTP_NOT_FOUND);
-    }
-
 }

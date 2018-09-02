@@ -3,21 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use App\Http\Controllers\Api\Traits\ApiResponseTraits;
 
-class TonkenController extends Controller
+class TonkenController extends ApiController
 {
-    use AuthenticatesUsers,ApiResponseTraits;
+    use AuthenticatesUsers;
     
+    #获取授权码方法
     public function index(Request $request)
     {   
         #数据验证
         $validator = $this->validator($request);
 
-        if ($validator->fails()) {
-            return $this->failed( $validator->errors()->toArray() );
+        if( $validator->fails() ) {
+            return $this->message( $validator->errors()->first(),403);
         }
 
         #开始登录
@@ -28,7 +28,7 @@ class TonkenController extends Controller
         $credentials['password'] = $request->password;
 
         if( !$this->guard('api')->attempt($credentials) ) {
-            return $this->failed('用户名或密码错误');
+            return $this->message('用户名或密码错误',403);
         } 
 
         return $this->authenticate($request);
