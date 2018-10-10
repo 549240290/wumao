@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
+
 class TonkenController extends ApiController
 {
     use AuthenticatesUsers;
@@ -17,7 +18,7 @@ class TonkenController extends ApiController
         $validator = $this->validator($request);
 
         if( $validator->fails() ) {
-            return $this->message( $validator->errors()->first(),403);
+            return $this->failed( $validator->errors()->first(),403);
         }
 
         #开始登录
@@ -28,8 +29,8 @@ class TonkenController extends ApiController
         $credentials['password'] = $request->password;
 
         if( !$this->guard('api')->attempt($credentials) ) {
-            return $this->message('用户名或密码错误',403);
-        } 
+            return $this->failed('用户名或密码错误',403);
+        }
 
         return $this->authenticate($request);
         
@@ -52,9 +53,13 @@ class TonkenController extends ApiController
             'POST'
         );
 
-        $response = \Route::dispatch($proxy);
+        try{
+            $respond = \Route::dispatch($proxy);
+        } catch (\Exception $e) {
+            return $this->failed('获取token异常',500);
+        }
 
-        return $response;
+        return $respond;
     }
 
     #登录数据验证
